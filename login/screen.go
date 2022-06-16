@@ -56,7 +56,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "tab", "shift+tab", "up", "down":
 				m.updateSelectedField(msg.String())
 			case "enter":
-				m.loading = true
+				if m.selectedInput == len(m.inputs)-1 {
+					m.loading = true
+				}
 			default:
 				m.pink = !m.pink
 			}
