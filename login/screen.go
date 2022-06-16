@@ -97,7 +97,7 @@ func (m model) View() string {
 		backgroundColor = lipgloss.Color(black)
 	}
 
-	ui := lipgloss.Place(termWidth-2, termHeight-2, lipgloss.Center, lipgloss.Center, content, lipgloss.WithWhitespaceChars("░"), lipgloss.WithWhitespaceForeground(backgroundColor))
+	ui := lipgloss.Place(termWidth, termHeight-2, lipgloss.Center, lipgloss.Center, content, lipgloss.WithWhitespaceChars("░"), lipgloss.WithWhitespaceForeground(backgroundColor))
 	doc.WriteString(ui)
 
 	return doc.String()
