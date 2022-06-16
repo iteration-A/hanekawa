@@ -18,6 +18,7 @@ type model struct {
 	selectedInput int
 	inputs        []textinput.Model
 	pink          bool
+	loading       bool
 }
 
 func InitialModel() model {
@@ -52,8 +53,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			switch msg.String() {
 			case "ctrl+c", "esc":
 				return m, tea.Quit
-			case "tab", "shift+tab", "enter", "up", "down":
+			case "tab", "shift+tab", "up", "down":
 				m.updateSelectedField(msg.String())
+			case "enter":
+				m.loading = true
 			default:
 				m.pink = !m.pink
 			}
@@ -81,6 +84,10 @@ func (m model) View() string {
 	}
 
 	content := lipgloss.JoinVertical(lipgloss.Center, inputs...)
+	if m.loading {
+		content = "Loading..."
+	}
+
 	var backgroundColor lipgloss.Color
 	if m.pink {
 		backgroundColor = lipgloss.Color(pink)

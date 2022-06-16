@@ -2,7 +2,7 @@ package login
 
 func (m *model) updateSelectedField(msg string) {
 	switch msg {
-	case "tab", "enter", "down":
+	case "tab", "down":
 		if m.selectedInput < len(m.inputs)-1 {
 			m.selectedInput++
 		} else {
