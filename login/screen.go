@@ -1,11 +1,10 @@
 package login
 
 import (
-	"fmt"
 	"strings"
 	"time"
 
-	"github.com/charmbracelet/bubbles/spinner"
+	"github.com/charmbracelet/bubbles/progress"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -18,7 +17,7 @@ type model struct {
 	pink          bool
 	loading       bool
 	token         token
-	loader        spinner.Model
+	loader        progress.Model
 }
 
 func InitialModel() model {
@@ -36,10 +35,8 @@ func InitialModel() model {
 	password.Prompt = " "
 	password.EchoMode = textinput.EchoPassword
 
-	loader := spinner.New()
-	loader.Spinner = spinner.Moon
-	loader.Spinner.FPS = time.Second * 3
-	loader.Spinner.Frames = []string{"Hacking nasa...", "Entering the wire...", "Writing cringe phrases..."}
+	loader := progress.New(progress.WithGradient(pink, black))
+	loader.ShowPercentage = false
 
 	return model{
 		selectedInput: 0,
@@ -48,8 +45,16 @@ func InitialModel() model {
 	}
 }
 
+type tickMsg time.Time
+
+func tickCmd() tea.Cmd {
+	return tea.Tick(time.Second*1, func(t time.Time) tea.Msg {
+		return tickMsg(t)
+	})
+}
+
 func (m model) Init() tea.Cmd {
-	return tea.Batch([]tea.Cmd{textinput.Blink, m.loader.Tick}...)
+	return tea.Batch([]tea.Cmd{textinput.Blink, tickCmd()}...)
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -72,8 +77,18 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case token:
-		m.loading = false
 		m.token = msg
+		cmd := m.loader.SetPercent(1.0)
+		return m, tea.Batch(tickCmd(), cmd)
+
+	case tickMsg:
+		cmd := m.loader.IncrPercent(0.15)
+		return m, tea.Batch(tickCmd(), cmd)
+
+	case progress.FrameMsg:
+		loaderMod, cmd := m.loader.Update(msg)
+		m.loader = loaderMod.(progress.Model)
+		return m, cmd
 	}
 
 	cmds := make([]tea.Cmd, len(m.inputs))
@@ -81,10 +96,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.inputs[index], cmds[index] = input.Update(msg)
 	}
 
-	var cmd tea.Cmd
-	m.loader, cmd = m.loader.Update(msg)
-
-	return m, tea.Batch(append(cmds, cmd)...)
+	return m, tea.Batch(cmds...)
 }
 
 func (m model) View() string {
@@ -102,9 +114,6 @@ func (m model) View() string {
 	content := lipgloss.JoinVertical(lipgloss.Center, inputs...)
 	if m.loading {
 		content = m.loader.View()
-	}
-	if m.token != "" {
-		content = fmt.Sprintf("%v\n", m.token)
 	}
 
 	var backgroundColor lipgloss.Color
