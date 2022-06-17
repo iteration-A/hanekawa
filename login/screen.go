@@ -19,6 +19,7 @@ type model struct {
 	inputs        []textinput.Model
 	pink          bool
 	loading       bool
+	token         token
 }
 
 func InitialModel() model {
@@ -58,11 +59,15 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "enter":
 				if m.selectedInput == len(m.inputs)-1 {
 					m.loading = true
+					return m, getToken(m.inputs[0].Value(), m.inputs[1].Value())
 				}
 			default:
 				m.pink = !m.pink
 			}
 		}
+
+	case token:
+		m.token = msg
 	}
 
 	cmds := make([]tea.Cmd, len(m.inputs))
