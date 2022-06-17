@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	termWidth, termHeight, _ = term.GetSize(int(os.Stderr.Fd()))
+	termWidth, termHeight, _ = term.GetSize(int(os.Stdout.Fd()))
 )
 
 type model struct {
