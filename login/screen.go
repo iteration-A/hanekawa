@@ -1,17 +1,15 @@
 package login
 
 import (
-	"os"
+	"fmt"
 	"strings"
+	"time"
 
+	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"golang.org/x/term"
-)
-
-var (
-	termWidth, termHeight, _ = term.GetSize(int(os.Stdout.Fd()))
+	"github.com/iteration-A/emma/constants"
 )
 
 type model struct {
@@ -20,6 +18,7 @@ type model struct {
 	pink          bool
 	loading       bool
 	token         token
+	loader        spinner.Model
 }
 
 func InitialModel() model {
@@ -37,14 +36,20 @@ func InitialModel() model {
 	password.Prompt = " "
 	password.EchoMode = textinput.EchoPassword
 
+	loader := spinner.New()
+	loader.Spinner = spinner.Moon
+	loader.Spinner.FPS = time.Second * 3
+	loader.Spinner.Frames = []string{"Hacking nasa...", "Entering the wire...", "Writing cringe phrases..."}
+
 	return model{
 		selectedInput: 0,
 		inputs:        []textinput.Model{username, password},
+		loader:        loader,
 	}
 }
 
 func (m model) Init() tea.Cmd {
-	return textinput.Blink
+	return tea.Batch([]tea.Cmd{textinput.Blink, m.loader.Tick}...)
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -67,6 +72,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case token:
+		m.loading = false
 		m.token = msg
 	}
 
@@ -75,7 +81,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.inputs[index], cmds[index] = input.Update(msg)
 	}
 
-	return m, tea.Batch(cmds...)
+	var cmd tea.Cmd
+	m.loader, cmd = m.loader.Update(msg)
+
+	return m, tea.Batch(append(cmds, cmd)...)
 }
 
 func (m model) View() string {
@@ -92,7 +101,10 @@ func (m model) View() string {
 
 	content := lipgloss.JoinVertical(lipgloss.Center, inputs...)
 	if m.loading {
-		content = "Loading..."
+		content = m.loader.View()
+	}
+	if m.token != "" {
+		content = fmt.Sprintf("%v\n", m.token)
 	}
 
 	var backgroundColor lipgloss.Color
@@ -102,7 +114,7 @@ func (m model) View() string {
 		backgroundColor = lipgloss.Color(black)
 	}
 
-	ui := lipgloss.Place(termWidth, termHeight-2, lipgloss.Center, lipgloss.Center, content, lipgloss.WithWhitespaceChars("░"), lipgloss.WithWhitespaceForeground(backgroundColor))
+	ui := lipgloss.Place(constants.TermWidth-1, constants.TermHeight-2, lipgloss.Center, lipgloss.Center, content, lipgloss.WithWhitespaceChars("░"), lipgloss.WithWhitespaceForeground(backgroundColor))
 	doc.WriteString(ui)
 
 	return doc.String()
