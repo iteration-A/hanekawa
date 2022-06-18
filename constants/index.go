@@ -6,6 +6,11 @@ import (
 	"golang.org/x/term"
 )
 
+const (
+	Pink  = "#d2738a"
+	Black = "#000000"
+)
+
 var (
 	TermWidth, TermHeight, _ = term.GetSize(int(os.Stdout.Fd()))
 )

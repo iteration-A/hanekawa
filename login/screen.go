@@ -9,6 +9,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/iteration-A/hanekawa/constants"
+	"github.com/iteration-A/hanekawa/prompts"
 )
 
 type Model struct {
@@ -26,7 +27,7 @@ func New() Model {
 }
 
 func initialLoaderModel() progress.Model {
-	loader := progress.New(progress.WithGradient(pink, black))
+	loader := progress.New(progress.WithGradient(constants.Pink, constants.Black))
 	loader.ShowPercentage = false
 	loader.SetPercent(0.01)
 	return loader
@@ -155,14 +156,14 @@ func (m Model) View() string {
 	}
 
 	if m.badCredentials {
-		content = "Bad credentials!"
+		content = prompts.BadCredentials
 	}
 
 	var backgroundColor lipgloss.Color
 	if m.pink {
-		backgroundColor = lipgloss.Color(pink)
+		backgroundColor = lipgloss.Color(constants.Pink)
 	} else {
-		backgroundColor = lipgloss.Color(black)
+		backgroundColor = lipgloss.Color(constants.Black)
 	}
 
 	ui := lipgloss.Place(constants.TermWidth-1, constants.TermHeight-2, lipgloss.Center, lipgloss.Center, content, lipgloss.WithWhitespaceChars("░"), lipgloss.WithWhitespaceForeground(backgroundColor))
