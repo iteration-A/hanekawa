@@ -5,6 +5,7 @@ import (
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/iteration-A/hanekawa/chat"
 	"github.com/iteration-A/hanekawa/constants"
 	login "github.com/iteration-A/hanekawa/login"
 	"github.com/iteration-A/hanekawa/rooms"
@@ -20,12 +21,13 @@ type model struct {
 const (
 	loginScreen = iota
 	roomsScreen
+	chatScreen
 )
 
 func initialModel() model {
 	return model{
 		token:       "",
-		screens:     []tea.Model{login.New(), rooms.New()},
+		screens:     []tea.Model{login.New(), rooms.New(), chat.New()},
 		screenIndex: loginScreen,
 		firstRender: true,
 	}
