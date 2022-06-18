@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	warning = lipgloss.NewStyle().
+	Warning = lipgloss.NewStyle().
 		Border(lipgloss.NormalBorder()).
 		BorderForeground(lipgloss.Color(constants.Pink)).
 		Padding(1, 2).

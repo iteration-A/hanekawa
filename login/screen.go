@@ -20,6 +20,7 @@ type Model struct {
 	token          tokenMsg
 	loader         progress.Model
 	badCredentials bool
+	serverError    bool
 }
 
 func New() Model {
@@ -99,12 +100,17 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 
+	case serverErrorMsg:
+		m.serverError = true
+		return m, clearErrorCmd()
+
 	case badCredentialsMsg:
 		m.badCredentials = true
 		return m, clearErrorCmd()
 
 	case clearErrorMsg:
 		m.badCredentials = false
+		m.serverError = false
 		m.loading = false
 		m.loader = initialLoaderModel()
 		return m, nil
@@ -117,7 +123,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tickMsg:
 		var cmd tea.Cmd
-		if m.loading {
+		if m.loading && m.loader.Percent() < 0.85 {
 			cmd = m.loader.IncrPercent(0.15)
 		}
 		return m, tea.Batch(tickCmd(), cmd)
@@ -154,7 +160,11 @@ func (m Model) View() string {
 	}
 
 	if m.badCredentials {
-		content = prompts.BadCredentials
+		content = prompts.Warning.Render("Bad credentials")
+	}
+
+	if m.serverError {
+		content = prompts.Warning.Render("Server is dead")
 	}
 
 	var backgroundColor lipgloss.Color

@@ -13,6 +13,7 @@ import (
 
 type tokenMsg string
 type badCredentialsMsg struct{}
+type serverErrorMsg struct{}
 
 type tokenResp struct {
 	Token string `json:"token"`
@@ -31,22 +32,25 @@ func getToken(username, password string) tea.Cmd {
 		}
 
 		resp, err := http.Post("http://localhost:3000/login", "application/json", bytes.NewBuffer(body))
-		if resp.Status != "200 OK" {
-			return badCredentialsMsg{}
-		}
-
 		if err != nil {
-			log.Fatalf("An error ocurred\n%v", err)
+			return serverErrorMsg{}
 		}
 		defer resp.Body.Close()
 
-		body, err = ioutil.ReadAll(resp.Body)
-		if err != nil {
-			log.Fatalf("An error ocurred\n%v", err)
-		}
+		switch resp.Status {
+		case "200 OK":
+			body, err = ioutil.ReadAll(resp.Body)
+			if err != nil {
+				log.Fatalf("An error ocurred\n%v", err)
+			}
 
-		var tResp tokenResp
-		json.Unmarshal(body, &tResp)
-		return tokenMsg(tResp.Token)
+			var tResp tokenResp
+			json.Unmarshal(body, &tResp)
+			return tokenMsg(tResp.Token)
+		case "401 Unauthorized":
+			return badCredentialsMsg{}
+		default:
+			return serverErrorMsg{}
+		}
 	}
 }
