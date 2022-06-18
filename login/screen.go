@@ -11,7 +11,7 @@ import (
 	"github.com/iteration-A/emma/constants"
 )
 
-type model struct {
+type Model struct {
 	selectedInput int
 	inputs        []textinput.Model
 	pink          bool
@@ -20,7 +20,11 @@ type model struct {
 	loader        progress.Model
 }
 
-func InitialModel() model {
+func New() Model {
+	return initialModel()
+}
+
+func initialModel() Model {
 	username := textinput.New()
 	username.Placeholder = "username"
 	username.Width = 30
@@ -37,8 +41,9 @@ func InitialModel() model {
 
 	loader := progress.New(progress.WithGradient(pink, black))
 	loader.ShowPercentage = false
+	loader.SetPercent(0.01)
 
-	return model{
+	return Model{
 		selectedInput: 0,
 		inputs:        []textinput.Model{username, password},
 		loader:        loader,
@@ -53,11 +58,17 @@ func tickCmd() tea.Cmd {
 	})
 }
 
-func (m model) Init() tea.Cmd {
+func sleepAndThenPassToken(token string) tea.Cmd {
+	return tea.Cmd(func() tea.Msg {
+		return constants.TokenMsg(token)
+	})
+}
+
+func (m Model) Init() tea.Cmd {
 	return tea.Batch([]tea.Cmd{textinput.Blink, tickCmd()}...)
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		{
@@ -79,7 +90,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case token:
 		m.token = msg
 		cmd := m.loader.SetPercent(1.0)
-		return m, tea.Batch(tickCmd(), cmd)
+		tokenCmd := sleepAndThenPassToken(string(m.token))
+		return m, tea.Batch(tickCmd(), cmd, tokenCmd)
 
 	case tickMsg:
 		cmd := m.loader.IncrPercent(0.15)
@@ -99,7 +111,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, tea.Batch(cmds...)
 }
 
-func (m model) View() string {
+func (m Model) View() string {
 	doc := strings.Builder{}
 
 	inputs := make([]string, len(m.inputs))

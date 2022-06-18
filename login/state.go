@@ -1,6 +1,6 @@
 package login
 
-func (m *model) updateSelectedField(msg string) {
+func (m *Model) updateSelectedField(msg string) {
 	switch msg {
 	case "tab", "down":
 		if m.selectedInput < len(m.inputs)-1 {
