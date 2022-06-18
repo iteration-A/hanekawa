@@ -12,20 +12,31 @@ import (
 
 type model struct {
 	token       string
-	loginScreen login.Model
-	roomsScreen rooms.Model
+	screens []tea.Model
+	screenIndex int
 }
+
+const (
+	loginScreen = iota
+	roomsScreen
+)
 
 func initialModel() model {
 	return model{
 		token:       "",
-		loginScreen: login.New(),
-		roomsScreen: rooms.New(),
+		screens: []tea.Model{login.New(), rooms.New()},
+		screenIndex: loginScreen,
 	}
 }
 
 func (m model) Init() tea.Cmd {
-	return tea.Batch(m.loginScreen.Init())
+	cmds := make([]tea.Cmd, len(m.screens))
+
+	for index, screen := range m.screens {
+		cmds[index] = screen.Init()
+	}
+
+	return tea.Batch(cmds...)
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -37,18 +48,22 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	case constants.TokenMsg:
 		m.token = msg.String()
+		m.screenIndex = roomsScreen
 	}
-	loginScreenMod, cmd := m.loginScreen.Update(msg)
-	m.loginScreen = loginScreenMod.(login.Model)
-	return m, tea.Batch(cmd)
+
+
+	cmds := make([]tea.Cmd, len(m.screens))
+	for index := range m.screens {
+		var cmd tea.Cmd
+		m.screens[index], cmd = m.screens[index].Update(msg)
+		cmds[index] = cmd
+	}
+
+	return m, tea.Batch(cmds...)
 }
 
 func (m model) View() string {
-	if m.token == "" {
-		return m.loginScreen.View()
-	} else {
-		return m.roomsScreen.View()
-	}
+	return m.screens[m.screenIndex].View()
 }
 
 func main() {
