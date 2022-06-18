@@ -7,6 +7,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/iteration-A/hanekawa/headings"
+	"github.com/iteration-A/hanekawa/statusbar"
 )
 
 // TODO: REMOVE
@@ -110,5 +111,5 @@ func (m Model) headerView() string {
 	return headings.Title("Chat rooms")
 }
 func (m Model) footerView() string {
-	return "FOOTER"
+	return statusbar.StatusLine("j↓ k↑", "Center", "Hanekawa")
 }
