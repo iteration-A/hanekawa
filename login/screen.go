@@ -87,8 +87,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		{
 			switch msg.String() {
-			case "ctrl+c", "esc":
-				return m, tea.Quit
 			case "tab", "shift+tab", "up", "down":
 				m.updateSelectedField(msg.String())
 			case "enter":
