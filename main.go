@@ -28,7 +28,7 @@ func initialModel() model {
 	return model{
 		token:       "",
 		screens:     []tea.Model{login.New(), rooms.New(), chat.New()},
-		screenIndex: roomsScreen,
+		screenIndex: loginScreen,
 		firstRender: true,
 	}
 }
@@ -67,6 +67,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case constants.TokenMsg:
 		m.token = msg.String()
 		m.screenIndex = roomsScreen
+	case constants.RoomSelectedMsg:
+		m.screenIndex = chatScreen
 	case tea.WindowSizeMsg:
 		m.firstRender = false
 	}

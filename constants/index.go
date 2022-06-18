@@ -7,9 +7,9 @@ import (
 )
 
 const (
-	Primary  = "#e9f542"
+	Primary     = "#e9f542"
 	PrimaryDark = "#757a2d"
-	Secondary = "#000000"
+	Secondary   = "#000000"
 )
 
 var (
@@ -21,3 +21,7 @@ type TokenMsg string
 func (t TokenMsg) String() string {
 	return string(t)
 }
+
+type RoomSelectedMsg string
+
+func (r RoomSelectedMsg) String() string { return string(r) }

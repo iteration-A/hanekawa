@@ -8,11 +8,9 @@ import (
 	"github.com/iteration-A/hanekawa/constants"
 )
 
-type roomSelectedMsg item
-
 func roomSelectedCmd(room item) tea.Cmd {
 	return func() tea.Msg {
-		return roomSelectedMsg(room)
+		return constants.RoomSelectedMsg(room.title)
 	}
 }
 
@@ -93,12 +91,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m Model) View() string {
 	str := strings.Builder{}
-
-	if m.choice.title != "" {
-		str.WriteString("Selected: ")
-		str.WriteString(m.choice.title)
-		str.WriteRune('\n')
-	}
 
 	str.WriteString(m.list.View())
 
