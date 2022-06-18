@@ -71,10 +71,13 @@ func clearErrorCmd() tea.Cmd {
 	}
 }
 
-func sleepAndThenPassTokenCmd(token string) tea.Cmd {
+func sleepAndThenPassTokenCmd(token, username string) tea.Cmd {
 	return tea.Cmd(func() tea.Msg {
 		time.Sleep(time.Second * 1)
-		return constants.TokenMsg(token)
+		return constants.TokenMsg{
+			Token:    token,
+			Username: username,
+		}
 	})
 }
 
@@ -115,7 +118,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tokenMsg:
 		m.token = msg
 		cmd := m.loader.SetPercent(1.0)
-		tokenCmd := sleepAndThenPassTokenCmd(string(m.token))
+		tokenCmd := sleepAndThenPassTokenCmd(string(m.token), m.inputs[0].Value())
 		return m, tea.Batch([]tea.Cmd{tickCmd(), cmd, tokenCmd}...)
 
 	case tickMsg:

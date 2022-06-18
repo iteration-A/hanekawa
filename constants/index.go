@@ -16,10 +16,9 @@ var (
 	TermWidth, TermHeight, _ = term.GetSize(int(os.Stdout.Fd()))
 )
 
-type TokenMsg string
-
-func (t TokenMsg) String() string {
-	return string(t)
+type TokenMsg struct {
+	Token    string
+	Username string
 }
 
 type RoomSelectedMsg string

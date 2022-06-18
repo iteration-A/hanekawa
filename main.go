@@ -65,10 +65,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		}
 	case constants.TokenMsg:
-		m.token = msg.String()
+		m.token = msg.Token
 		m.screenIndex = roomsScreen
+		var cmd tea.Cmd
+		m.screens[chatScreen], cmd = m.screens[chatScreen].Update(msg)
+		cmds = append(cmds, cmd)
 	case constants.RoomSelectedMsg:
 		m.screenIndex = chatScreen
+
 	case tea.WindowSizeMsg:
 		m.firstRender = false
 	}

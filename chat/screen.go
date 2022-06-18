@@ -69,6 +69,7 @@ type Model struct {
 	typing      bool
 	firstLetter bool
 	chatName    string
+	username    string
 }
 
 func initialModel() Model {
@@ -114,6 +115,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case constants.RoomSelectedMsg:
 		m.chatName = msg.String()
+
+	case constants.TokenMsg:
+		m.username = string(msg.Username)
 
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -200,7 +204,9 @@ func (m Model) calcExcess() int {
 }
 
 func (m *Model) addMessage(msg string) {
-	tempMessages = append(tempMessages, msg)
+	formattedMsg := fmt.Sprintf("[%s] %s", m.username, msg)
+
+	tempMessages = append(tempMessages, formattedMsg)
 	m.content = joinMessages(tempMessages)
 }
 
