@@ -68,7 +68,6 @@ type Model struct {
 	input       textinput.Model
 	typing      bool
 	firstLetter bool
-	gging       bool
 }
 
 func initialModel() Model {
@@ -123,12 +122,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.typing {
 				break
 			}
-			if m.gging {
-				m.viewport.YOffset = 0
-				m.gging = false
-			} else {
-				m.gging = true
-			}
+			m.viewport.YOffset = 0
 
 		case "G":
 			if m.typing {
