@@ -12,16 +12,24 @@ import (
 )
 
 type Model struct {
-	selectedInput int
-	inputs        []textinput.Model
-	pink          bool
-	loading       bool
-	token         token
-	loader        progress.Model
+	selectedInput  int
+	inputs         []textinput.Model
+	pink           bool
+	loading        bool
+	token          tokenMsg
+	loader         progress.Model
+	badCredentials bool
 }
 
 func New() Model {
 	return initialModel()
+}
+
+func initialLoaderModel() progress.Model {
+	loader := progress.New(progress.WithGradient(pink, black))
+	loader.ShowPercentage = false
+	loader.SetPercent(0.01)
+	return loader
 }
 
 func initialModel() Model {
@@ -39,18 +47,15 @@ func initialModel() Model {
 	password.Prompt = " "
 	password.EchoMode = textinput.EchoPassword
 
-	loader := progress.New(progress.WithGradient(pink, black))
-	loader.ShowPercentage = false
-	loader.SetPercent(0.01)
-
 	return Model{
 		selectedInput: 0,
 		inputs:        []textinput.Model{username, password},
-		loader:        loader,
+		loader:        initialLoaderModel(),
 	}
 }
 
 type tickMsg time.Time
+type clearErrorMsg struct{}
 
 func tickCmd() tea.Cmd {
 	return tea.Tick(time.Second*1, func(t time.Time) tea.Msg {
@@ -58,7 +63,14 @@ func tickCmd() tea.Cmd {
 	})
 }
 
-func sleepAndThenPassToken(token string) tea.Cmd {
+func clearErrorCmd() tea.Cmd {
+	return func() tea.Msg {
+		time.Sleep(time.Second * 2)
+		return clearErrorMsg{}
+	}
+}
+
+func sleepAndThenPassTokenCmd(token string) tea.Cmd {
 	return tea.Cmd(func() tea.Msg {
 		time.Sleep(time.Second * 1)
 		return constants.TokenMsg(token)
@@ -88,10 +100,20 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 
-	case token:
+	case badCredentialsMsg:
+		m.badCredentials = true
+		return m, clearErrorCmd()
+
+	case clearErrorMsg:
+		m.badCredentials = false
+		m.loading = false
+		m.loader = initialLoaderModel()
+		return m, nil
+
+	case tokenMsg:
 		m.token = msg
 		cmd := m.loader.SetPercent(1.0)
-		tokenCmd := sleepAndThenPassToken(string(m.token))
+		tokenCmd := sleepAndThenPassTokenCmd(string(m.token))
 		return m, tea.Batch([]tea.Cmd{tickCmd(), cmd, tokenCmd}...)
 
 	case tickMsg:
@@ -130,6 +152,10 @@ func (m Model) View() string {
 	content := lipgloss.JoinVertical(lipgloss.Center, inputs...)
 	if m.loading {
 		content = m.loader.View()
+	}
+
+	if m.badCredentials {
+		content = "Bad credentials!"
 	}
 
 	var backgroundColor lipgloss.Color
