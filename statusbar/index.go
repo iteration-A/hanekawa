@@ -25,7 +25,7 @@ func StatusLine(l, c, r string) string {
 	r = right.Render(r)
 
 	gapWidth := constants.TermWidth - w(l) - w(r)
-	gap := center.Width(gapWidth).Align(lipgloss.Center).Render(c)
+	gap := center.Width(gapWidth).Align(lipgloss.Left).PaddingLeft(1).Render(c)
 
 	content := lipgloss.JoinHorizontal(lipgloss.Center, l, gap, r)
 	return lipgloss.Place(constants.TermWidth, 1, lipgloss.Center, lipgloss.Center, content)
