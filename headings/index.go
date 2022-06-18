@@ -8,8 +8,8 @@ import (
 )
 
 var title = lipgloss.NewStyle().
-	Background(lipgloss.Color(constants.Pink)).
-	Foreground(lipgloss.Color(constants.Black))
+	Background(lipgloss.Color(constants.Primary)).
+	Foreground(lipgloss.Color(constants.Secondary))
 
 func Title(message string) string {
 	gap := strings.Repeat(" ", (constants.TermWidth-lipgloss.Width(message)) / 2)

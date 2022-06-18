@@ -7,13 +7,13 @@ import (
 
 var (
 	left = lipgloss.NewStyle().
-		Background(lipgloss.Color(constants.Pink)).
-		Foreground(lipgloss.Color(constants.Black)).
+		Background(lipgloss.Color(constants.Primary)).
+		Foreground(lipgloss.Color(constants.Secondary)).
 		Padding(0, 1)
 
 	center = lipgloss.NewStyle().
-		Background(lipgloss.Color(constants.Black)).
-		Foreground(lipgloss.Color(constants.Pink))
+		Background(lipgloss.Color(constants.Secondary)).
+		Foreground(lipgloss.Color(constants.Primary))
 
 	right = left.Copy()
 )

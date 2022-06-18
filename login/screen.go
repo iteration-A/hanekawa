@@ -27,7 +27,7 @@ func New() Model {
 }
 
 func initialLoaderModel() progress.Model {
-	loader := progress.New(progress.WithGradient(constants.Pink, constants.Black))
+	loader := progress.New(progress.WithGradient(constants.Primary, constants.Secondary))
 	loader.ShowPercentage = false
 	loader.SetPercent(0.01)
 	return loader
@@ -152,8 +152,13 @@ func (m Model) View() string {
 	}
 
 	content := lipgloss.JoinVertical(lipgloss.Center, inputs...)
+	title := prompts.Title.Width(lipgloss.Width(content)).Render("Hanekawa")
+	content = lipgloss.JoinVertical(lipgloss.Center, title, content)
+	whitespace := lipgloss.WithWhitespaceChars("こんにちは")
+
 	if m.loading {
 		content = m.loader.View()
+		whitespace = lipgloss.WithWhitespaceChars("")
 	}
 
 	if m.badCredentials {
@@ -164,16 +169,13 @@ func (m Model) View() string {
 		content = prompts.Warning.Render("Server is dead")
 	}
 
-	var backgroundColor lipgloss.Color
-	backgroundColor = lipgloss.Color(constants.Pink)
-
 	ui := lipgloss.Place(constants.TermWidth-1,
 		constants.TermHeight-2,
 		lipgloss.Center,
 		lipgloss.Center,
 		content,
-		lipgloss.WithWhitespaceChars("こんにちは"),
-		lipgloss.WithWhitespaceForeground(backgroundColor))
+		whitespace,
+		lipgloss.WithWhitespaceForeground(lipgloss.Color(constants.PrimaryDark)))
 
 	doc.WriteString(ui)
 

@@ -7,6 +7,6 @@ import (
 
 var (
 	placeholder = lipgloss.NewStyle().
-		Background(lipgloss.Color(constants.Black)).
-		Foreground(lipgloss.Color(constants.Pink))
+		Background(lipgloss.Color(constants.Secondary)).
+		Foreground(lipgloss.Color(constants.Primary))
 )

@@ -7,8 +7,9 @@ import (
 )
 
 const (
-	Pink  = "#d2738a"
-	Black = "#000000"
+	Primary  = "#e9f542"
+	PrimaryDark = "#757a2d"
+	Secondary = "#000000"
 )
 
 var (
