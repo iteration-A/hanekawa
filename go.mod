@@ -1,4 +1,4 @@
-module github.com/iteration-A/emma
+module github.com/iteration-A/hanekawa
 
 go 1.18
 

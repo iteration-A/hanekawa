@@ -5,8 +5,8 @@ import (
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/iteration-A/emma/constants"
-	login "github.com/iteration-A/emma/login"
+	"github.com/iteration-A/hanekawa/constants"
+	login "github.com/iteration-A/hanekawa/login"
 )
 
 type model struct {
@@ -39,7 +39,7 @@ func (m model) View() string {
 	if m.token == "" {
 		return m.loginScreen.View()
 	} else {
-		return "ok"
+		return m.token
 	}
 }
 

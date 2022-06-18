@@ -8,7 +8,7 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/iteration-A/emma/constants"
+	"github.com/iteration-A/hanekawa/constants"
 )
 
 type Model struct {
