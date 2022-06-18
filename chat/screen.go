@@ -68,6 +68,7 @@ type Model struct {
 	input       textinput.Model
 	typing      bool
 	firstLetter bool
+	chatName    string
 }
 
 func initialModel() Model {
@@ -110,6 +111,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.viewport.Width = msg.Width
 			m.viewport.Height = msg.Height - height
 		}
+
+	case constants.RoomSelectedMsg:
+		m.chatName = msg.String()
+
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "i":
@@ -173,7 +178,7 @@ func (m Model) View() string {
 }
 
 func (m Model) headerView() string {
-	return headings.Title("Topic")
+	return headings.Title(m.chatName)
 }
 func (m Model) footerView() string {
 	var msg string
