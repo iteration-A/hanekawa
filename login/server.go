@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -21,7 +20,6 @@ type tokenResp struct {
 
 func getToken(username, password string) tea.Cmd {
 	return func() tea.Msg {
-		time.Sleep(time.Second * 3)
 		body, err := json.Marshal(map[string]string{
 			"username": username,
 			"password": password,

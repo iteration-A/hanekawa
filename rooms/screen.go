@@ -6,7 +6,55 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/iteration-A/hanekawa/headings"
 )
+
+// TODO: REMOVE
+const content = `
+[hanekawa]: hi
+[nadeko]: bye
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+[hanekawa]: :(
+`
 
 type Model struct {
 	content  string
@@ -36,7 +84,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if !m.ready {
 			m.viewport = viewport.New(msg.Width, msg.Height-height)
 			m.viewport.YPosition = headerHeight
-			m.viewport.SetContent("aaaaaaa")
+			m.viewport.SetContent(content)
 			m.ready = true
 		} else {
 			m.viewport.Width = msg.Width
@@ -59,7 +107,7 @@ func (m Model) View() string {
 }
 
 func (m Model) headerView() string {
-	return "HEADER"
+	return headings.Title("Chat rooms")
 }
 func (m Model) footerView() string {
 	return "FOOTER"
