@@ -1,4 +1,4 @@
-package rooms
+package chat
 
 import (
 	"github.com/charmbracelet/lipgloss"

@@ -1,4 +1,4 @@
-package rooms
+package chat
 
 import (
 	"fmt"
@@ -178,7 +178,7 @@ func (m Model) View() string {
 }
 
 func (m Model) headerView() string {
-	return headings.Title("Chat rooms")
+	return headings.Title("Topic")
 }
 func (m Model) footerView() string {
 	var msg string
