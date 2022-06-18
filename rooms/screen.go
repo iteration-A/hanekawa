@@ -3,9 +3,11 @@ package rooms
 import (
 	"fmt"
 
+	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/iteration-A/hanekawa/constants"
 	"github.com/iteration-A/hanekawa/headings"
 	"github.com/iteration-A/hanekawa/statusbar"
 )
@@ -58,13 +60,26 @@ const content = `
 `
 
 type Model struct {
-	content  string
-	ready    bool
-	viewport viewport.Model
+	content     string
+	ready       bool
+	viewport    viewport.Model
+	input       textinput.Model
+	typing      bool
+	firstLetter bool
 }
 
 func initialModel() Model {
-	return Model{}
+	i := textinput.New()
+	i.CharLimit = 80
+	i.Width = constants.TermWidth / 2
+	i.Prompt = ""
+	i.Placeholder = "Type something..."
+	i.PlaceholderStyle = placeholder
+	i.SetCursorMode(textinput.CursorStatic)
+
+	return Model{
+		input: i,
+	}
 }
 
 func New() Model {
@@ -91,12 +106,36 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.viewport.Width = msg.Width
 			m.viewport.Height = msg.Height - height
 		}
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "i":
+			if !m.typing {
+				m.typing = true
+				m.input.Focus()
+				m.firstLetter = true
+			}
 
+		case "esc":
+			m.typing = false
+			m.input.Blur()
+
+		default:
+			m.firstLetter = false
+		}
 	}
 
+	var cmds []tea.Cmd
 	var cmd tea.Cmd
-	m.viewport, cmd = m.viewport.Update(msg)
-	return m, cmd
+	if m.typing {
+		if !m.firstLetter {
+			m.input, cmd = m.input.Update(msg)
+			cmds = append(cmds, cmd)
+		}
+	} else {
+		m.viewport, cmd = m.viewport.Update(msg)
+		cmds = append(cmds, cmd)
+	}
+	return m, tea.Batch(cmds...)
 }
 
 func (m Model) View() string {
@@ -111,5 +150,12 @@ func (m Model) headerView() string {
 	return headings.Title("Chat rooms")
 }
 func (m Model) footerView() string {
-	return statusbar.StatusLine("j↓ k↑", "Center", "Hanekawa")
+	var msg string
+	if m.typing {
+		msg = "INSERT (esc)"
+	} else {
+		msg = "j↓ k↑ i(type)"
+	}
+
+	return statusbar.StatusLine(msg, m.input.View(), "Hanekawa")
 }

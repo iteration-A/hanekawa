@@ -12,7 +12,7 @@ import (
 
 type model struct {
 	token       string
-	screens []tea.Model
+	screens     []tea.Model
 	screenIndex int
 }
 
@@ -24,7 +24,7 @@ const (
 func initialModel() model {
 	return model{
 		token:       "",
-		screens: []tea.Model{login.New(), rooms.New()},
+		screens:     []tea.Model{login.New(), rooms.New()},
 		screenIndex: loginScreen,
 	}
 }
@@ -43,14 +43,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "ctrl+c", "esc":
+		case "ctrl+c":
 			return m, tea.Quit
 		}
 	case constants.TokenMsg:
 		m.token = msg.String()
 		m.screenIndex = roomsScreen
 	}
-
 
 	cmds := make([]tea.Cmd, len(m.screens))
 	for index := range m.screens {
