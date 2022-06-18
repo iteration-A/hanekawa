@@ -15,7 +15,6 @@ import (
 type Model struct {
 	selectedInput  int
 	inputs         []textinput.Model
-	pink           bool
 	loading        bool
 	token          tokenMsg
 	loader         progress.Model
@@ -95,8 +94,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.loading = true
 					return m, getToken(m.inputs[0].Value(), m.inputs[1].Value())
 				}
-			default:
-				m.pink = !m.pink
 			}
 		}
 
@@ -168,13 +165,16 @@ func (m Model) View() string {
 	}
 
 	var backgroundColor lipgloss.Color
-	if m.pink {
-		backgroundColor = lipgloss.Color(constants.Pink)
-	} else {
-		backgroundColor = lipgloss.Color(constants.Black)
-	}
+	backgroundColor = lipgloss.Color(constants.Pink)
 
-	ui := lipgloss.Place(constants.TermWidth-1, constants.TermHeight-2, lipgloss.Center, lipgloss.Center, content, lipgloss.WithWhitespaceChars("░"), lipgloss.WithWhitespaceForeground(backgroundColor))
+	ui := lipgloss.Place(constants.TermWidth-1,
+		constants.TermHeight-2,
+		lipgloss.Center,
+		lipgloss.Center,
+		content,
+		lipgloss.WithWhitespaceChars("こんにちは"),
+		lipgloss.WithWhitespaceForeground(backgroundColor))
+
 	doc.WriteString(ui)
 
 	return doc.String()
