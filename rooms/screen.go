@@ -157,5 +157,5 @@ func (m Model) footerView() string {
 		msg = "j↓ k↑ i(type)"
 	}
 
-	return statusbar.StatusLine(msg, m.input.View(), "Hanekawa")
+	return statusbar.StatusLine(msg, m.input.View(), "Hanekawa🍙")
 }
