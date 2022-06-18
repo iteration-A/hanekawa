@@ -104,6 +104,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.viewport.YPosition = headerHeight
 			m.content = joinMessages(tempMessages)
 			m.viewport.SetContent(m.content)
+			m.viewport.YOffset = m.calcExcess()
 			m.ready = true
 		} else {
 			m.viewport.Width = msg.Width
