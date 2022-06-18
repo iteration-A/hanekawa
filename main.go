@@ -7,17 +7,20 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/iteration-A/hanekawa/constants"
 	login "github.com/iteration-A/hanekawa/login"
+	"github.com/iteration-A/hanekawa/rooms"
 )
 
 type model struct {
 	token       string
 	loginScreen login.Model
+	roomsScreen rooms.Model
 }
 
 func initialModel() model {
 	return model{
 		token:       "",
 		loginScreen: login.New(),
+		roomsScreen: rooms.New(),
 	}
 }
 
@@ -39,7 +42,7 @@ func (m model) View() string {
 	if m.token == "" {
 		return m.loginScreen.View()
 	} else {
-		return m.token
+		return m.roomsScreen.View()
 	}
 }
 
