@@ -158,7 +158,6 @@ func (m Model) View() string {
 
 	if m.loading {
 		content = m.loader.View()
-		whitespace = lipgloss.WithWhitespaceChars("")
 	}
 
 	if m.badCredentials {
