@@ -28,7 +28,7 @@ func initialModel() model {
 	return model{
 		token:       "",
 		screens:     []tea.Model{login.New(), rooms.New(), chat.New()},
-		screenIndex: chatScreen,
+		screenIndex: roomsScreen,
 		firstRender: true,
 	}
 }
