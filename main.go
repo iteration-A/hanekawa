@@ -12,7 +12,6 @@ import (
 type model struct {
 	token       string
 	loginScreen login.Model
-	ticks       int
 }
 
 func initialModel() model {
@@ -31,7 +30,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case constants.TokenMsg:
 		m.token = msg.String()
 	}
-	m.ticks++
 	loginScreenMod, cmd := m.loginScreen.Update(msg)
 	m.loginScreen = loginScreenMod.(login.Model)
 	return m, tea.Batch(cmd)
@@ -39,7 +37,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m model) View() string {
 	if m.token == "" {
-		return fmt.Sprintf("%v\n%d", m.loginScreen.View(), m.ticks)
+		return m.loginScreen.View()
 	} else {
 		return "ok"
 	}

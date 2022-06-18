@@ -60,6 +60,7 @@ func tickCmd() tea.Cmd {
 
 func sleepAndThenPassToken(token string) tea.Cmd {
 	return tea.Cmd(func() tea.Msg {
+		time.Sleep(time.Second * 1)
 		return constants.TokenMsg(token)
 	})
 }
@@ -91,10 +92,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.token = msg
 		cmd := m.loader.SetPercent(1.0)
 		tokenCmd := sleepAndThenPassToken(string(m.token))
-		return m, tea.Batch(tickCmd(), cmd, tokenCmd)
+		return m, tea.Batch([]tea.Cmd{tickCmd(), cmd, tokenCmd}...)
 
 	case tickMsg:
-		cmd := m.loader.IncrPercent(0.15)
+		var cmd tea.Cmd
+		if m.loading {
+			cmd = m.loader.IncrPercent(0.15)
+		}
 		return m, tea.Batch(tickCmd(), cmd)
 
 	case progress.FrameMsg:
