@@ -14,6 +14,7 @@ type model struct {
 	token       string
 	screens     []tea.Model
 	screenIndex int
+	firstRender bool
 }
 
 const (
@@ -26,6 +27,7 @@ func initialModel() model {
 		token:       "",
 		screens:     []tea.Model{login.New(), rooms.New()},
 		screenIndex: loginScreen,
+		firstRender: true,
 	}
 }
 
@@ -40,6 +42,20 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+
+	var cmds []tea.Cmd
+	for index := range m.screens {
+		if !m.firstRender {
+			if index != m.screenIndex {
+				continue
+			}
+		}
+
+		var cmd tea.Cmd
+		m.screens[index], cmd = m.screens[index].Update(msg)
+		cmds = append(cmds, cmd)
+	}
+
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -49,13 +65,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case constants.TokenMsg:
 		m.token = msg.String()
 		m.screenIndex = roomsScreen
-	}
-
-	cmds := make([]tea.Cmd, len(m.screens))
-	for index := range m.screens {
-		var cmd tea.Cmd
-		m.screens[index], cmd = m.screens[index].Update(msg)
-		cmds[index] = cmd
+	case tea.WindowSizeMsg:
+		m.firstRender = false
 	}
 
 	return m, tea.Batch(cmds...)
