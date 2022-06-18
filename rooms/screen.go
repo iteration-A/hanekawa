@@ -2,6 +2,7 @@ package rooms
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
@@ -13,51 +14,52 @@ import (
 )
 
 // TODO: REMOVE
-const content = `
-[hanekawa]: hi
-[nadeko]: bye
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-[hanekawa]: :(
-`
+var tempMessages = []string{
+	"[hanekawa]: hi",
+	"[nadeko]: hi",
+	"[nadeko]: bye",
+	"[hanekawa]: :( 1",
+	"[hanekawa]: :( 2",
+	"[hanekawa]: :( 3",
+	"[hanekawa]: :( 4",
+	"[hanekawa]: :( 5",
+	"[hanekawa]: :( 6",
+	"[hanekawa]: :( 7",
+	"[hanekawa]: :( 8",
+	"[hanekawa]: :( 9",
+	"[hanekawa]: :( 10",
+	"[hanekawa]: :( 11",
+	"[hanekawa]: :( 12",
+	"[hanekawa]: :( 13",
+	"[hanekawa]: :( 14",
+	"[hanekawa]: :( 15",
+	"[hanekawa]: :( 16",
+	"[hanekawa]: :( 17",
+	"[hanekawa]: :( 18",
+	"[hanekawa]: :( 19",
+	"[hanekawa]: :( 20",
+	"[hanekawa]: :( 21",
+	"[hanekawa]: :( 22",
+	"[hanekawa]: :( 23",
+	"[hanekawa]: :( 24",
+	"[hanekawa]: :( 25",
+	"[hanekawa]: :( 26",
+	"[hanekawa]: :( 27",
+	"[hanekawa]: :( 28",
+	"[hanekawa]: :( 29",
+	"[hanekawa]: :( 30",
+	"[hanekawa]: :( 31",
+	"[hanekawa]: :( 32",
+	"[hanekawa]: :( 33",
+	"[hanekawa]: :( 34",
+	"[hanekawa]: :( 35",
+	"[hanekawa]: :( 36",
+	"[hanekawa]: :( 37",
+	"[hanekawa]: :( 38",
+	"[hanekawa]: :( 39",
+	"[hanekawa]: :( 40",
+	"[hanekawa]: :( 41",
+}
 
 type Model struct {
 	content     string
@@ -66,6 +68,7 @@ type Model struct {
 	input       textinput.Model
 	typing      bool
 	firstLetter bool
+	gging       bool
 }
 
 func initialModel() Model {
@@ -100,7 +103,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if !m.ready {
 			m.viewport = viewport.New(msg.Width, msg.Height-height)
 			m.viewport.YPosition = headerHeight
-			m.viewport.SetContent(content)
+			m.content = joinMessages(tempMessages)
+			m.viewport.SetContent(m.content)
 			m.ready = true
 		} else {
 			m.viewport.Width = msg.Width
@@ -115,9 +119,36 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.firstLetter = true
 			}
 
+		case "g":
+			if m.typing {
+				break
+			}
+			if m.gging {
+				m.viewport.YOffset = 0
+				m.gging = false
+			} else {
+				m.gging = true
+			}
+
+		case "G":
+			if m.typing {
+				break
+			}
+			m.viewport.YOffset = 0
+			m.viewport.YOffset = m.calcExcess()
+
 		case "esc":
 			m.typing = false
 			m.input.Blur()
+
+		case "enter":
+			h := lipgloss.Height
+			msgHeight := h(m.input.Value())
+			m.addMessage(m.input.Value())
+			m.input.SetValue("")
+			m.viewport.SetContent(m.content)
+			excess := m.calcExcess()
+			m.viewport.YOffset = excess + msgHeight
 
 		default:
 			m.firstLetter = false
@@ -158,4 +189,21 @@ func (m Model) footerView() string {
 	}
 
 	return statusbar.StatusLine(msg, m.input.View(), "Hanekawa🍙")
+}
+
+func (m Model) calcExcess() int {
+	h := lipgloss.Height
+	totalHeight := constants.TermHeight - h(m.headerView()) - h(m.footerView())
+	excess := h(m.content) - totalHeight
+
+	return excess
+}
+
+func (m *Model) addMessage(msg string) {
+	tempMessages = append(tempMessages, msg)
+	m.content = joinMessages(tempMessages)
+}
+
+func joinMessages(messages []string) string {
+	return strings.Join(messages, "\n")
 }
