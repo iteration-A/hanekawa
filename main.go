@@ -70,6 +70,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		var cmd tea.Cmd
 		m.screens[chatScreen], cmd = m.screens[chatScreen].Update(msg)
 		cmds = append(cmds, cmd)
+		m.screens[roomsScreen], cmd = m.screens[roomsScreen].Update(msg)
+		cmds = append(cmds, cmd)
+
 	case constants.RoomSelectedMsg:
 		m.screenIndex = chatScreen
 

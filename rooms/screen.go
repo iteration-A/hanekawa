@@ -45,7 +45,7 @@ func New() Model {
 }
 
 func (m Model) Init() tea.Cmd {
-	return getRoomsCmd
+	return nil
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -65,6 +65,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.items = items
 		cmd := m.list.SetItems(m.items)
 		cmds = append(cmds, cmd)
+
+	case constants.TokenMsg:
+		return m, getRoomsCmd
 
 	case tea.KeyMsg:
 		switch key := msg.String(); key {
