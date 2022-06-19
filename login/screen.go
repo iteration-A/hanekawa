@@ -13,14 +13,13 @@ import (
 )
 
 type Model struct {
-	selectedInput  int
-	inputs         []textinput.Model
-	loading        bool
-	token          tokenMsg
-	loader         progress.Model
-	badCredentials bool
-	serverError    bool
-	retrievingToken bool
+	selectedInput   int
+	inputs          []textinput.Model
+	loading         bool
+	token           string
+	loader          progress.Model
+	badCredentials  bool
+	serverError     bool
 }
 
 func New() Model {
@@ -50,10 +49,9 @@ func initialModel() Model {
 	password.EchoMode = textinput.EchoPassword
 
 	return Model{
-		selectedInput: 0,
-		inputs:        []textinput.Model{username, password},
-		loader:        initialLoaderModel(),
-		retrievingToken: true,
+		selectedInput:   0,
+		inputs:          []textinput.Model{username, password},
+		loader:          initialLoaderModel(),
 	}
 }
 
@@ -73,13 +71,10 @@ func clearErrorCmd() tea.Cmd {
 	}
 }
 
-func sleepAndThenPassTokenCmd(token, username string) tea.Cmd {
+func sleepAndThenPassTokenCmd(msg tea.Msg) tea.Cmd {
 	return tea.Cmd(func() tea.Msg {
 		time.Sleep(time.Second * 1)
-		return constants.TokenMsg{
-			Token:    token,
-			Username: username,
-		}
+		return msg
 	})
 }
 
@@ -102,9 +97,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 
-	case noToken:
-		m.retrievingToken = false
-
 	case serverErrorMsg:
 		m.serverError = true
 		return m, clearErrorCmd()
@@ -120,10 +112,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.loader = initialLoaderModel()
 		return m, nil
 
-	case tokenMsg:
-		m.token = msg
+	case constants.TokenMsg:
+		m.token = msg.Token
 		cmd := m.loader.SetPercent(1.0)
-		tokenCmd := sleepAndThenPassTokenCmd(string(m.token), m.inputs[0].Value())
+		tokenCmd := sleepAndThenPassTokenCmd(msg)
 		return m, tea.Batch([]tea.Cmd{tickCmd(), cmd, tokenCmd}...)
 
 	case tickMsg:
@@ -163,9 +155,6 @@ func (m Model) View() string {
 	content = lipgloss.JoinVertical(lipgloss.Center, "Hello.", content)
 	content = lipgloss.JoinHorizontal(lipgloss.Center, Art(), content)
 
-	if m.retrievingToken {
-		content = "Retrieving token..."
-	}
 
 	whitespace := lipgloss.WithWhitespaceChars("こんにちは")
 

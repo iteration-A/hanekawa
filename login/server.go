@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/iteration-A/hanekawa/constants"
 )
 
 type tokenMsg string
@@ -16,6 +17,7 @@ type serverErrorMsg struct{}
 
 type tokenResp struct {
 	Token string `json:"token"`
+	Username string `json:"username"`
 }
 
 func getToken(username, password string) tea.Cmd {
@@ -47,7 +49,10 @@ func getToken(username, password string) tea.Cmd {
 
 			saveToken([]byte(tResp.Token))
 
-			return tokenMsg(tResp.Token)
+			return constants.TokenMsg{
+				Token: tResp.Token,
+				Username: tResp.Username,
+			}
 		case "401 Unauthorized":
 			return badCredentialsMsg{}
 		default:

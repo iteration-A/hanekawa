@@ -1,6 +1,7 @@
 package login
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -25,6 +26,7 @@ func saveToken(token []byte) bool {
 }
 
 type noToken struct{}
+
 func retrieveToken() tea.Msg {
 	if _, err := os.Stat(filename); errors.Is(err, os.ErrNotExist) {
 		return noToken{}
@@ -38,14 +40,22 @@ func retrieveToken() tea.Msg {
 
 	token := string(bytes)
 
-	if !validateToken(token) {
-		return noToken{}
-	}
+	username := validateTokenAndGetUsername(token)
 
-	return tokenMsg(token)
+	return constants.TokenMsg{
+		Token:    token,
+		Username: username,
+	}
 }
 
-func validateToken(token string) bool {
+func validateTokenAndGetUsername(token string) string {
+	type user struct {
+		Username string `json:"username"`
+	}
+	type testResp struct {
+		User user `json:"user"`
+	}
+
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", "http://localhost:3000/test", nil)
 	if err != nil {
@@ -55,8 +65,17 @@ func validateToken(token string) bool {
 	req.Header.Add("Authorization", token)
 	res, err := client.Do(req)
 	if err != nil {
-		return false
+		log.Fatal(err)
 	}
 
-	return res.Status == "200 OK"
+	defer res.Body.Close()
+	var tResp testResp
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	json.Unmarshal(body, &tResp)
+
+	return tResp.User.Username
 }
