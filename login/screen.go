@@ -155,8 +155,8 @@ func (m Model) View() string {
 	}
 
 	content := lipgloss.JoinVertical(lipgloss.Center, inputs...)
-	title := prompts.Title.Width(lipgloss.Width(content)).Render("Hanekawa")
-	content = lipgloss.JoinVertical(lipgloss.Center, title, content)
+	content = lipgloss.JoinVertical(lipgloss.Center, "Hello.", content)
+	content = lipgloss.JoinHorizontal(lipgloss.Center, Art(), content)
 	whitespace := lipgloss.WithWhitespaceChars("こんにちは")
 
 	if m.loading {
@@ -177,7 +177,7 @@ func (m Model) View() string {
 		lipgloss.Center,
 		content,
 		whitespace,
-		lipgloss.WithWhitespaceForeground(lipgloss.Color(constants.PrimaryDark)))
+		lipgloss.WithWhitespaceForeground(lipgloss.Color(constants.Dark)))
 
 	doc.WriteString(ui)
 

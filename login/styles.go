@@ -6,6 +6,13 @@ import (
 )
 
 var (
-	input         = lipgloss.NewStyle().Border(lipgloss.NormalBorder()).BorderForeground(lipgloss.Color(constants.Secondary)).Width(30).Padding(0)
-	selectedInput = input.Copy().BorderForeground(lipgloss.Color(constants.Primary))
+	input = lipgloss.NewStyle().
+		Border(lipgloss.NormalBorder()).
+		BorderForeground(lipgloss.Color(constants.Secondary)).
+		Width(30).
+		Padding(0).
+		Margin(0, 1)
+
+	selectedInput = input.Copy().
+			BorderForeground(lipgloss.Color(constants.Primary))
 )
