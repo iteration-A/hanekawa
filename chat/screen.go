@@ -126,6 +126,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.typing = true
 				m.input.Focus()
 				m.firstLetter = true
+			} else {
+				m.firstLetter = false
 			}
 
 		case "g":
