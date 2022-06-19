@@ -114,7 +114,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case constants.RoomSelectedMsg:
-		m.chatName = msg.String()
+		m.chatName = string(msg)
 
 	case constants.TokenMsg:
 		m.username = string(msg.Username)

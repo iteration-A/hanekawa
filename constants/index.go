@@ -25,15 +25,6 @@ var (
 	TermWidth, TermHeight, _ = term.GetSize(int(os.Stdout.Fd()))
 )
 
-type TokenMsg struct {
-	Token    string
-	Username string
-}
-
-type RoomSelectedMsg string
-
-func (r RoomSelectedMsg) String() string { return string(r) }
-
 func RetrieveTokenWithoutCheck() string {
 	bytes, err := ioutil.ReadFile(fmt.Sprintf("%s/.token", Basepath))
 
