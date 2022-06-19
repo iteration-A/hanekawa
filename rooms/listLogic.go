@@ -8,14 +8,9 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type item struct {
-	title string
-	desc  string
-}
+func (i item) FilterValue() string { return i.Title }
 
-func (i item) FilterValue() string { return i.title }
-
-func (i item) String() string { return i.title }
+func (i item) String() string { return i.Title }
 
 func (i item) Height() int { return 1 }
 

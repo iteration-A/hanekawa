@@ -1,6 +1,9 @@
 package constants
 
 import (
+	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -30,3 +33,13 @@ type TokenMsg struct {
 type RoomSelectedMsg string
 
 func (r RoomSelectedMsg) String() string { return string(r) }
+
+func RetrieveTokenWithoutCheck() string {
+	bytes, err := ioutil.ReadFile(fmt.Sprintf("%s/.token", Basepath))
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return string(bytes)
+}

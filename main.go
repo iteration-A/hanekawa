@@ -47,11 +47,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	var cmds []tea.Cmd
 	for index := range m.screens {
-		if !m.firstRender {
-			if index != m.screenIndex {
-				continue
-			}
-		}
+		// if !m.firstRender {
+		// 	if index != m.screenIndex {
+		// 		continue
+		// 	}
+		// }
 
 		var cmd tea.Cmd
 		m.screens[index], cmd = m.screens[index].Update(msg)
