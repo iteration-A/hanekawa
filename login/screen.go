@@ -20,6 +20,7 @@ type Model struct {
 	loader         progress.Model
 	badCredentials bool
 	serverError    bool
+	retrievingToken bool
 }
 
 func New() Model {
@@ -52,6 +53,7 @@ func initialModel() Model {
 		selectedInput: 0,
 		inputs:        []textinput.Model{username, password},
 		loader:        initialLoaderModel(),
+		retrievingToken: true,
 	}
 }
 
@@ -82,7 +84,7 @@ func sleepAndThenPassTokenCmd(token, username string) tea.Cmd {
 }
 
 func (m Model) Init() tea.Cmd {
-	return tea.Batch([]tea.Cmd{textinput.Blink, tickCmd()}...)
+	return tea.Batch([]tea.Cmd{textinput.Blink, tickCmd(), retrieveToken}...)
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -99,6 +101,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 		}
+
+	case noToken:
+		m.retrievingToken = false
 
 	case serverErrorMsg:
 		m.serverError = true
@@ -157,6 +162,11 @@ func (m Model) View() string {
 	content := lipgloss.JoinVertical(lipgloss.Center, inputs...)
 	content = lipgloss.JoinVertical(lipgloss.Center, "Hello.", content)
 	content = lipgloss.JoinHorizontal(lipgloss.Center, Art(), content)
+
+	if m.retrievingToken {
+		content = "Retrieving token..."
+	}
+
 	whitespace := lipgloss.WithWhitespaceChars("こんにちは")
 
 	if m.loading {

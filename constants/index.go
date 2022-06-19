@@ -2,9 +2,14 @@ package constants
 
 import (
 	"os"
+	"path/filepath"
+	"runtime"
 
 	"golang.org/x/term"
 )
+
+var _, base, _, ok = runtime.Caller(0)
+var Basepath = filepath.Join(filepath.Dir(base), "../")
 
 const (
 	Primary     = "#e9f542"

@@ -44,6 +44,9 @@ func getToken(username, password string) tea.Cmd {
 
 			var tResp tokenResp
 			json.Unmarshal(body, &tResp)
+
+			saveToken([]byte(tResp.Token))
+
 			return tokenMsg(tResp.Token)
 		case "401 Unauthorized":
 			return badCredentialsMsg{}
