@@ -16,7 +16,7 @@ type badCredentialsMsg struct{}
 type serverErrorMsg struct{}
 
 type tokenResp struct {
-	Token string `json:"token"`
+	Token    string `json:"token"`
 	Username string `json:"username"`
 }
 
@@ -50,7 +50,7 @@ func getToken(username, password string) tea.Cmd {
 			saveToken([]byte(tResp.Token))
 
 			return constants.TokenMsg{
-				Token: tResp.Token,
+				Token:    tResp.Token,
 				Username: tResp.Username,
 			}
 		case "401 Unauthorized":

@@ -13,54 +13,6 @@ import (
 	"github.com/iteration-A/hanekawa/statusbar"
 )
 
-// TODO: REMOVE
-var tempMessages = []string{
-	"[hanekawa]: hi",
-	"[nadeko]: hi",
-	"[nadeko]: bye",
-	"[hanekawa]: :( 1",
-	"[hanekawa]: :( 2",
-	"[hanekawa]: :( 3",
-	"[hanekawa]: :( 4",
-	"[hanekawa]: :( 5",
-	"[hanekawa]: :( 6",
-	"[hanekawa]: :( 7",
-	"[hanekawa]: :( 8",
-	"[hanekawa]: :( 9",
-	"[hanekawa]: :( 10",
-	"[hanekawa]: :( 11",
-	"[hanekawa]: :( 12",
-	"[hanekawa]: :( 13",
-	"[hanekawa]: :( 14",
-	"[hanekawa]: :( 15",
-	"[hanekawa]: :( 16",
-	"[hanekawa]: :( 17",
-	"[hanekawa]: :( 18",
-	"[hanekawa]: :( 19",
-	"[hanekawa]: :( 20",
-	"[hanekawa]: :( 21",
-	"[hanekawa]: :( 22",
-	"[hanekawa]: :( 23",
-	"[hanekawa]: :( 24",
-	"[hanekawa]: :( 25",
-	"[hanekawa]: :( 26",
-	"[hanekawa]: :( 27",
-	"[hanekawa]: :( 28",
-	"[hanekawa]: :( 29",
-	"[hanekawa]: :( 30",
-	"[hanekawa]: :( 31",
-	"[hanekawa]: :( 32",
-	"[hanekawa]: :( 33",
-	"[hanekawa]: :( 34",
-	"[hanekawa]: :( 35",
-	"[hanekawa]: :( 36",
-	"[hanekawa]: :( 37",
-	"[hanekawa]: :( 38",
-	"[hanekawa]: :( 39",
-	"[hanekawa]: :( 40",
-	"[hanekawa]: :( 41",
-}
-
 type Model struct {
 	content     string
 	ready       bool
@@ -104,7 +56,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if !m.ready {
 			m.viewport = viewport.New(msg.Width, msg.Height-height)
 			m.viewport.YPosition = headerHeight
-			m.content = joinMessages(tempMessages)
 			m.viewport.SetContent(m.content)
 			m.viewport.YOffset = m.calcExcess()
 			m.ready = true
@@ -115,6 +66,19 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case constants.RoomSelectedMsg:
 		m.chatName = string(msg)
+		return m, getLastMessagesCmd(m.chatName)
+
+	case MessagesMsg:
+		messages := make([]string, len(msg))
+		for index, message := range msg {
+			messages[index] = formatMessage(message)
+		}
+		m.content = joinMessages(messages)
+		m.viewport.SetContent(m.content)
+		m.viewport.YOffset = m.calcExcess() + lipgloss.Height(m.content)
+		var cmd tea.Cmd
+		m.viewport, cmd = m.viewport.Update(msg)
+		return m, cmd
 
 	case constants.TokenMsg:
 		m.username = string(msg.Username)
@@ -150,7 +114,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "enter":
 			h := lipgloss.Height
 			msgHeight := h(m.input.Value())
-			m.addMessage(m.input.Value())
 			m.input.SetValue("")
 			m.viewport.SetContent(m.content)
 			excess := m.calcExcess()
@@ -205,11 +168,8 @@ func (m Model) calcExcess() int {
 	return excess
 }
 
-func (m *Model) addMessage(msg string) {
-	formattedMsg := fmt.Sprintf("[%s] %s", m.username, msg)
-
-	tempMessages = append(tempMessages, formattedMsg)
-	m.content = joinMessages(tempMessages)
+func formatMessage(msg message) string {
+	return fmt.Sprintf("[%s] %s", msg.User.Username, msg.Content)
 }
 
 func joinMessages(messages []string) string {
