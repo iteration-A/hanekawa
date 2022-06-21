@@ -6,6 +6,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/iteration-A/hanekawa/chat"
 	"github.com/iteration-A/hanekawa/constants"
 )
@@ -108,7 +109,8 @@ func (m Model) View() string {
 	if m.gettingRooms {
 		str.WriteString(fmt.Sprintf("%v", m.list.Items()))
 	} else {
-		str.WriteString(m.list.View())
+		content := lipgloss.Place(constants.TermWidth, constants.TermHeight, lipgloss.Center, lipgloss.Center, m.list.View())
+		str.WriteString(content)
 	}
 
 	return str.String()

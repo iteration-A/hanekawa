@@ -3,18 +3,23 @@ package rooms
 import (
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/iteration-A/hanekawa/constants"
 )
 
 var (
 	titleStyle = lipgloss.NewStyle().
-			MarginLeft(2)
+			Align(lipgloss.Center).
+			Width(constants.TermWidth - 10).
+			Foreground(lipgloss.Color(constants.Primary))
 
 	itemStyle = lipgloss.NewStyle().
-			PaddingLeft(4)
+			Background(lipgloss.Color(constants.Primary)).
+			Foreground(lipgloss.Color(constants.Secondary)).
+			Align(lipgloss.Center)
 
-	selectedItemStyle = lipgloss.NewStyle().
-				PaddingLeft(2).
-				Foreground(lipgloss.Color("170"))
+	selectedItemStyle = itemStyle.Copy().
+				Background(lipgloss.Color(constants.Secondary)).
+				Foreground(lipgloss.Color(constants.Primary))
 
 	paginationStyle = list.DefaultStyles().
 			PaginationStyle.

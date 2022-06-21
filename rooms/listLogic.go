@@ -6,6 +6,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/iteration-A/hanekawa/constants"
 )
 
 func (i item) FilterValue() string { return i.Title }
@@ -25,12 +26,13 @@ func (i item) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
 		return
 	}
 
-	str := fmt.Sprintf("%d. %s", index+1, item)
+	str := fmt.Sprintf("%s\n", item)
 
-	render := itemStyle.Render
+	style := itemStyle
 	if index == m.Index() {
-		render = selectedItemStyle.Render
+		style = selectedItemStyle
 	}
 
-	fmt.Fprintf(w, render(str))
+	content := style.Width(constants.TermWidth - 10).Render(str)
+	fmt.Fprintf(w, content)
 }
