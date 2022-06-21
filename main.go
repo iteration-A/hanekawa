@@ -76,6 +76,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case constants.RoomSelectedMsg:
 		m.screenIndex = chatScreen
 
+	case chat.GoToRooms:
+		m.screenIndex = roomsScreen
+		var cmd tea.Cmd
+		m.screens[roomsScreen], cmd = m.screens[roomsScreen].Update(msg)
+		cmds = append(cmds, cmd)
+
 	case tea.WindowSizeMsg:
 		m.firstRender = false
 	}

@@ -6,6 +6,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/iteration-A/hanekawa/chat"
 	"github.com/iteration-A/hanekawa/constants"
 )
 
@@ -68,6 +69,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case constants.TokenMsg:
 		return m, getRoomsCmd
+
+	case chat.GoToRooms:
+		m.choice = item{}
 
 	case tea.KeyMsg:
 		switch key := msg.String(); key {

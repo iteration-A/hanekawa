@@ -85,6 +85,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		switch msg.String() {
+		case "h", "H":
+			if !m.typing {
+				return m, goToRoomsCmd
+			}
+
 		case "i":
 			if !m.typing {
 				m.typing = true
