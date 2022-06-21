@@ -75,7 +75,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		switch key := msg.String(); key {
-		case "enter":
+		case "enter", "l", "L":
 			i, ok := m.list.SelectedItem().(item)
 			if ok {
 				m.choice = i
