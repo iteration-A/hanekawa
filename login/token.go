@@ -42,6 +42,10 @@ func retrieveToken() tea.Msg {
 
 	username := validateTokenAndGetUsername(token)
 
+	if username == "" {
+		return noToken{}
+	}
+
 	return constants.TokenMsg{
 		Token:    token,
 		Username: username,
@@ -66,6 +70,10 @@ func validateTokenAndGetUsername(token string) string {
 	res, err := client.Do(req)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	if res.Status != "200 OK" {
+		return ""
 	}
 
 	defer res.Body.Close()
