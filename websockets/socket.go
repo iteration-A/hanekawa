@@ -1,7 +1,6 @@
 package websockets
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -29,12 +28,7 @@ func SubscribeToChatRoom(room, token string) {
 
 	defer conn.Close()
 
-	err = conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf(`
-	{
-		"command": "subscribe",
-		"identifier": "{\"channel\": \"ChatRoomChannel\", \"topic\": \"%s\"}"
-	}
-	`, room)))
+	err = conn.WriteMessage(websocket.TextMessage, []byte(subscribe(room)))
 
 	if err != nil {
 		log.Println(err)
@@ -57,25 +51,17 @@ func SubscribeToChatRoom(room, token string) {
 		}
 	}()
 
-	// ticker := time.NewTicker(time.Second)
-	// defer ticker.Stop()
-
 	for {
 		select {
 		case <-done:
 			return
 
-		// case <-ticker.C:
-		// 	err := conn.WriteMessage(websocket.TextMessage, []byte("{}"))
-		// 	if err != nil {
-		// 		log.Println(err)
-		// 		return
-		// 	}
-
 		case <-interrupt:
 			log.Println("interrupted")
 
-			err := conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+			err := conn.WriteMessage(
+				websocket.CloseMessage,
+				websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 
 			if err != nil {
 				log.Println(err)
