@@ -9,6 +9,7 @@ import (
 	"github.com/iteration-A/hanekawa/constants"
 	login "github.com/iteration-A/hanekawa/login"
 	"github.com/iteration-A/hanekawa/rooms"
+	"github.com/iteration-A/hanekawa/websockets"
 )
 
 type model struct {
@@ -75,8 +76,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case constants.RoomSelectedMsg:
 		m.screenIndex = chatScreen
+		websockets.ChatroomChan <- websockets.Subscribe{
+			Token: m.token,
+			Room:  string(msg),
+		}
 
 	case chat.GoToRooms:
+		websockets.ChatroomChan <- websockets.Unsubscribe{}
 		m.screenIndex = roomsScreen
 		var cmd tea.Cmd
 		m.screens[roomsScreen], cmd = m.screens[roomsScreen].Update(msg)
@@ -93,8 +99,20 @@ func (m model) View() string {
 	return m.screens[m.screenIndex].View()
 }
 
+var Program = tea.NewProgram(initialModel())
+
 func main() {
-	var Program = tea.NewProgram(initialModel())
+	defer close(websockets.ChatroomChan)
+	go func() {
+		for {
+			message := <-websockets.ChatroomChan
+			switch msg := message.(type) {
+			case websockets.Subscribe:
+				websockets.SubscribeToChatRoom(msg.Room, msg.Token)
+			}
+		}
+	}()
+
 	if err := Program.Start(); err != nil {
 		fmt.Printf("Ups.\n%v\n", err)
 		os.Exit(1)

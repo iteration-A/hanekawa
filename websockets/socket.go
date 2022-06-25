@@ -11,6 +11,14 @@ import (
 	"github.com/iteration-A/hanekawa/constants"
 )
 
+var ChatroomChan = make(chan interface{})
+
+type Subscribe struct {
+	Token string
+	Room  string
+}
+type Unsubscribe struct{}
+
 func SubscribeToChatRoom(room, token string) {
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
@@ -53,6 +61,12 @@ func SubscribeToChatRoom(room, token string) {
 
 	for {
 		select {
+		case msg := <-ChatroomChan:
+			switch msg.(type) {
+			case Unsubscribe:
+				return
+			}
+
 		case <-done:
 			return
 
