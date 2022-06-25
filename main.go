@@ -76,13 +76,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case constants.RoomSelectedMsg:
 		m.screenIndex = chatScreen
-		websockets.ChatroomChan <- websockets.Subscribe{
+		websockets.ChatroomChanIn <- websockets.Subscribe{
 			Token: m.token,
 			Room:  string(msg),
 		}
 
 	case chat.GoToRooms:
-		websockets.ChatroomChan <- websockets.Unsubscribe{}
+		websockets.ChatroomChanIn <- websockets.Unsubscribe{}
 		m.screenIndex = roomsScreen
 		var cmd tea.Cmd
 		m.screens[roomsScreen], cmd = m.screens[roomsScreen].Update(msg)
@@ -102,13 +102,23 @@ func (m model) View() string {
 var Program = tea.NewProgram(initialModel())
 
 func main() {
-	defer close(websockets.ChatroomChan)
+	defer close(websockets.ChatroomChanIn)
+	defer close(websockets.ChatroomChanOut)
 	go func() {
 		for {
-			message := <-websockets.ChatroomChan
+			message := <-websockets.ChatroomChanIn
 			switch msg := message.(type) {
 			case websockets.Subscribe:
 				websockets.SubscribeToChatRoom(msg.Room, msg.Token)
+			}
+		}
+	}()
+	go func() {
+		for {
+			message := <-websockets.ChatroomChanOut
+			switch msg := message.(type) {
+			case websockets.UserJoinedMsg:
+				Program.Send(msg)
 			}
 		}
 	}()

@@ -1,6 +1,7 @@
 package websockets
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"net/url"
@@ -11,13 +12,27 @@ import (
 	"github.com/iteration-A/hanekawa/constants"
 )
 
-var ChatroomChan = make(chan interface{})
+var ChatroomChanIn = make(chan interface{})
+var ChatroomChanOut = make(chan interface{})
 
 type Subscribe struct {
 	Token string
 	Room  string
 }
 type Unsubscribe struct{}
+
+type NewMessageMsg struct {
+	From    string
+	Content string
+}
+
+type UserJoinedMsg struct {
+	Username string
+}
+
+type UserLeftMsg struct {
+	Username string
+}
 
 func SubscribeToChatRoom(room, token string) {
 	interrupt := make(chan os.Signal, 1)
@@ -55,13 +70,28 @@ func SubscribeToChatRoom(room, token string) {
 				return
 			}
 
-			log.Println(string(message))
+			// parse response
+			// determine message type
+			// if message type "new_message" -> NewMessage
+			// if message type "user_join" -> UserJoin
+			// if message type "user_left" -> UserLeft
+			// else -> ignore
+			var response GenericResp
+			json.Unmarshal(message, &response)
+			switch response.Message.Type {
+			case "user_joined":
+				var response UserJoinedResp
+				json.Unmarshal(message, &response)
+				ChatroomChanOut <- UserJoinedMsg{
+					Username: response.Message.Data.User,
+				}
+			}
 		}
 	}()
 
 	for {
 		select {
-		case msg := <-ChatroomChan:
+		case msg := <-ChatroomChanIn:
 			switch msg.(type) {
 			case Unsubscribe:
 				return

@@ -11,6 +11,7 @@ import (
 	"github.com/iteration-A/hanekawa/constants"
 	"github.com/iteration-A/hanekawa/headings"
 	"github.com/iteration-A/hanekawa/statusbar"
+	"github.com/iteration-A/hanekawa/websockets"
 )
 
 type Model struct {
@@ -73,7 +74,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		for index, message := range msg {
 			messages[index] = formatMessage(message)
 		}
-		m.content = joinMessages(messages)
+		m.content = fmt.Sprintf("%s\n%s", joinedFormat(m.username), joinMessages(messages))
 		m.viewport.SetContent(m.content)
 		m.viewport.YOffset = m.calcExcess() + lipgloss.Height(m.content)
 		var cmd tea.Cmd
@@ -82,6 +83,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case constants.TokenMsg:
 		m.username = string(msg.Username)
+
+	case websockets.UserJoinedMsg:
+		m.content = fmt.Sprintf("%s\n%s\n", m.content, joinedFormat(msg.Username))
+		m.viewport.SetContent(m.content)
+		m.viewport.YOffset = m.calcExcess() + lipgloss.Height(m.content)
+		var cmd tea.Cmd
+		m.viewport, cmd = m.viewport.Update(msg)
+		return m, cmd
 
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -175,6 +184,10 @@ func (m Model) calcExcess() int {
 
 func formatMessage(msg message) string {
 	return fmt.Sprintf("[%s] %s", msg.User.Username, msg.Content)
+}
+
+func joinedFormat(username string) string {
+	return fmt.Sprintf("%v just joined!", username)
 }
 
 func joinMessages(messages []string) string {
