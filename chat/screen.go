@@ -85,7 +85,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.username = string(msg.Username)
 
 	case websockets.UserJoinedMsg:
-		m.content = fmt.Sprintf("%s\n%s\n", m.content, joinedFormat(msg.Username))
+		m.content = fmt.Sprintf("%s\n%s", m.content, joinedFormat(msg.Username))
 		m.viewport.SetContent(m.content)
 		m.viewport.YOffset = m.calcExcess() + lipgloss.Height(m.content)
 		var cmd tea.Cmd
