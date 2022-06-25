@@ -85,6 +85,13 @@ func SubscribeToChatRoom(room, token string) {
 				ChatroomChanOut <- UserJoinedMsg{
 					Username: response.Message.Data.User,
 				}
+
+			case "user_left":
+				var response UserLeftResp
+				json.Unmarshal(message, &response)
+				ChatroomChanOut <- UserLeftMsg{
+					Username: response.Message.Data.User,
+				}
 			}
 		}
 	}()

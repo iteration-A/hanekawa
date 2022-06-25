@@ -92,6 +92,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.viewport, cmd = m.viewport.Update(msg)
 		return m, cmd
 
+	case websockets.UserLeftMsg:
+		m.content = fmt.Sprintf("%s\n%s", m.content, leftFormat(msg.Username))
+		m.viewport.SetContent(m.content)
+		m.viewport.YOffset = m.calcExcess() + lipgloss.Height(m.content)
+		var cmd tea.Cmd
+		m.viewport, cmd = m.viewport.Update(msg)
+		return m, cmd
+
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "h", "H":
@@ -188,6 +196,10 @@ func formatMessage(msg message) string {
 
 func joinedFormat(username string) string {
 	return joinedMessage.Render(fmt.Sprintf("%v just joined!", username))
+}
+
+func leftFormat(username string) string {
+	return joinedMessage.Render(fmt.Sprintf("%v just left!", username))
 }
 
 func joinMessages(messages []string) string {

@@ -119,6 +119,9 @@ func main() {
 			switch msg := message.(type) {
 			case websockets.UserJoinedMsg:
 				Program.Send(msg)
+
+			case websockets.UserLeftMsg:
+				Program.Send(msg)
 			}
 		}
 	}()
