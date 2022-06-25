@@ -21,6 +21,11 @@ type Subscribe struct {
 }
 type Unsubscribe struct{}
 
+type SendMessage struct {
+	Room    string
+	Content string
+}
+
 type NewMessageMsg struct {
 	From    string
 	Content string
@@ -104,6 +109,10 @@ func SubscribeToChatRoom(room, token string) {
 			switch msg.(type) {
 			case Unsubscribe:
 				return
+
+			case SendMessage:
+				messageToSend := sendMessage(msg.(SendMessage).Room, msg.(SendMessage).Content)
+				conn.WriteMessage(websocket.TextMessage, []byte(messageToSend))
 			}
 
 		case <-done:

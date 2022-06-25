@@ -58,7 +58,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.viewport = viewport.New(msg.Width, msg.Height-height)
 			m.viewport.YPosition = headerHeight
 			m.viewport.SetContent(m.content)
-			m.viewport.YOffset = m.calcExcess()
 			m.ready = true
 		} else {
 			m.viewport.Width = msg.Width
@@ -76,7 +75,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		m.content = fmt.Sprintf("%s\n%s", joinedFormat(m.username), joinMessages(messages))
 		m.viewport.SetContent(m.content)
-		m.viewport.YOffset = m.calcExcess() + lipgloss.Height(m.content)
 		var cmd tea.Cmd
 		m.viewport, cmd = m.viewport.Update(msg)
 		return m, cmd
@@ -87,7 +85,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case websockets.UserJoinedMsg:
 		m.content = fmt.Sprintf("%s\n%s", m.content, joinedFormat(msg.Username))
 		m.viewport.SetContent(m.content)
-		m.viewport.YOffset = m.calcExcess() + lipgloss.Height(m.content)
 		var cmd tea.Cmd
 		m.viewport, cmd = m.viewport.Update(msg)
 		return m, cmd
@@ -95,7 +92,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case websockets.UserLeftMsg:
 		m.content = fmt.Sprintf("%s\n%s", m.content, leftFormat(msg.Username))
 		m.viewport.SetContent(m.content)
-		m.viewport.YOffset = m.calcExcess() + lipgloss.Height(m.content)
 		var cmd tea.Cmd
 		m.viewport, cmd = m.viewport.Update(msg)
 		return m, cmd
@@ -103,7 +99,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case websockets.NewMessageMsg:
 		m.content = fmt.Sprintf("%s\n%s", m.content, newMessageFormat(msg.From, msg.Content))
 		m.viewport.SetContent(m.content)
-		m.viewport.YOffset = m.calcExcess() + lipgloss.Height(m.content)
 		var cmd tea.Cmd
 		m.viewport, cmd = m.viewport.Update(msg)
 		return m, cmd
@@ -142,12 +137,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.input.Blur()
 
 		case "enter":
-			h := lipgloss.Height
-			msgHeight := h(m.input.Value())
+			websockets.ChatroomChanIn <- websockets.SendMessage{
+				Room:    m.chatName,
+				Content: m.input.Value(),
+			}
 			m.input.SetValue("")
-			m.viewport.SetContent(m.content)
-			excess := m.calcExcess()
-			m.viewport.YOffset = excess + msgHeight
 
 		default:
 			m.firstLetter = false
