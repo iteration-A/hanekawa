@@ -99,6 +99,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case websockets.NewMessageMsg:
 		m.content = fmt.Sprintf("%s\n%s", m.content, newMessageFormat(msg.From, msg.Content))
 		m.viewport.SetContent(m.content)
+		m.viewport.SetYOffset(m.calcExcess() + lipgloss.Height(m.content))
 		var cmd tea.Cmd
 		m.viewport, cmd = m.viewport.Update(msg)
 		return m, cmd
