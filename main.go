@@ -116,13 +116,7 @@ func main() {
 	go func() {
 		for {
 			message := <-websockets.ChatroomChanOut
-			switch msg := message.(type) {
-			case websockets.UserJoinedMsg:
-				Program.Send(msg)
-
-			case websockets.UserLeftMsg:
-				Program.Send(msg)
-			}
+			Program.Send(message)
 		}
 	}()
 

@@ -100,6 +100,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.viewport, cmd = m.viewport.Update(msg)
 		return m, cmd
 
+	case websockets.NewMessageMsg:
+		m.content = fmt.Sprintf("%s\n%s", m.content, newMessageFormat(msg.From, msg.Content))
+		m.viewport.SetContent(m.content)
+		m.viewport.YOffset = m.calcExcess() + lipgloss.Height(m.content)
+		var cmd tea.Cmd
+		m.viewport, cmd = m.viewport.Update(msg)
+		return m, cmd
+
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "h", "H":
@@ -192,6 +200,10 @@ func (m Model) calcExcess() int {
 
 func formatMessage(msg message) string {
 	return fmt.Sprintf("[%s] %s", msg.User.Username, msg.Content)
+}
+
+func newMessageFormat(username, content string) string {
+	return fmt.Sprintf("[%s] %s", username, content)
 }
 
 func joinedFormat(username string) string {
