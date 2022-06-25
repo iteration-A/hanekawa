@@ -70,12 +70,6 @@ func SubscribeToChatRoom(room, token string) {
 				return
 			}
 
-			// parse response
-			// determine message type
-			// if message type "new_message" -> NewMessage
-			// if message type "user_join" -> UserJoin
-			// if message type "user_left" -> UserLeft
-			// else -> ignore
 			var response GenericResp
 			json.Unmarshal(message, &response)
 			switch response.Message.Type {
@@ -91,6 +85,14 @@ func SubscribeToChatRoom(room, token string) {
 				json.Unmarshal(message, &response)
 				ChatroomChanOut <- UserLeftMsg{
 					Username: response.Message.Data.User,
+				}
+
+			case "new_message":
+				var response NewMessageResp
+				json.Unmarshal(message, &response)
+				ChatroomChanOut <- NewMessageMsg{
+					From:    response.Message.Data.Username,
+					Content: response.Message.Data.Content,
 				}
 			}
 		}
