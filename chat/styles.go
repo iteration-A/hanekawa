@@ -7,6 +7,9 @@ import (
 
 var (
 	placeholder = lipgloss.NewStyle().
-		Background(lipgloss.Color(constants.Secondary)).
-		Foreground(lipgloss.Color(constants.Primary))
+			Background(lipgloss.Color(constants.Secondary)).
+			Foreground(lipgloss.Color(constants.Primary))
+
+	joinedMessage = lipgloss.NewStyle().
+			Foreground(lipgloss.Color(constants.Primary))
 )

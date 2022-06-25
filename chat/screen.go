@@ -187,7 +187,7 @@ func formatMessage(msg message) string {
 }
 
 func joinedFormat(username string) string {
-	return fmt.Sprintf("%v just joined!", username)
+	return joinedMessage.Render(fmt.Sprintf("%v just joined!", username))
 }
 
 func joinMessages(messages []string) string {
